@@ -27,4 +27,8 @@ Ideas:
 * If the Json string is null or empty we may throw ArgumentNullException or JsonException
 * If the Json string is not in a valid format, we may throw JsonException 
 
+OR we can define CustomException class, which will throw InvalidJsonFileFormat exception if it is missing something,
+and EmptyJsonFileFormat for empty file -- later will dive deeper.
+
+
 */
