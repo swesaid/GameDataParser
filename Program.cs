@@ -1,20 +1,25 @@
 ﻿
+using System.Diagnostics;
 using System.Text.Json;
 
 public class Program 
 {
     public static void Main(string[] args)
     {
+
+        IUserInteraction userInteraction = new ConsoleUserInteraction();
+        IGameDataRepository gameDataRepository = new GameDataFileRepository(userInteraction);
+        ILogger logger = new ApplicationErrorLogger();
+        GameDataParserApp App = new GameDataParserApp(userInteraction, gameDataRepository);
+
         try
         {
-            IUserInteraction userInteraction = new ConsoleUserInteraction();
-            IGameDataRepository gameDataRepository = new GameDataFileRepository(userInteraction);
-
-            GameDataParserApp App = new GameDataParserApp(userInteraction, gameDataRepository);
             App.Run();
         }
         catch (Exception ex)
         {
+            string jsonFileName = App.FileName;
+            logger.Write(jsonFileName, ex);
             Console.WriteLine("Sorry! The application has experienced an unexpected error and will have to be closed.");
             Console.WriteLine("Press any key to close.");
             Console.ReadKey();
@@ -24,6 +29,7 @@ public class Program
 
 public class GameDataParserApp
 {
+    public string FileName { get; private set; }
     private readonly IUserInteraction _userInteraction;
     private readonly IGameDataRepository _gameDataRepository;
 
@@ -36,10 +42,10 @@ public class GameDataParserApp
     public void Run()
     {
         //Getting file name from user
-        string fileName = _userInteraction.ReadFileNameFromUser();
+        FileName = _userInteraction.ReadFileNameFromUser();
         
         //Reading the game data from a Json file.
-        List<GameData> gameData = _gameDataRepository.Read(fileName);
+        List<GameData> gameData = _gameDataRepository.Read(FileName);
         
         //Printing the game data.
         _userInteraction.PrintGamesData(gameData);
@@ -100,13 +106,13 @@ public class ConsoleUserInteraction : IUserInteraction
         Console.Write(message);
     }
 
-    public void PrintGamesData(List<GameData> gameDatas)
+    public void PrintGamesData(List<GameData> games)
     {
-        if (gameDatas.Count > 0)
+        if (games.Count > 0)
         {
             Console.WriteLine("\nLoaded games are: \n");
-            foreach (GameData gameData in gameDatas)
-                Console.WriteLine(gameData.ToString());
+            foreach (GameData game in games)
+                Console.WriteLine(game.ToString());
         }
         else
             Console.WriteLine("No games are present in the input file.");
@@ -154,8 +160,8 @@ public class GameDataFileRepository : IGameDataRepository
         try
         {
             jsonContent = File.ReadAllText(fileName);
-            List<GameData> gameDatas = JsonSerializer.Deserialize<List<GameData>>(jsonContent);
-            return gameDatas;
+            List<GameData> gameData = JsonSerializer.Deserialize<List<GameData>>(jsonContent);
+            return gameData;
         }
 
         catch(JsonException ex) 
@@ -166,5 +172,23 @@ public class GameDataFileRepository : IGameDataRepository
     }
 }
 
+public interface ILogger
+{
+    void Write(string fileName, Exception ex);
+
+}
+
+public class ApplicationErrorLogger : ILogger
+{
+    private const string _logFileName = "log.txt";
+    public void Write(string jsonFileName, Exception ex)
+    {
+        using (StreamWriter file = new StreamWriter(_logFileName, append: true))
+        {
+            file.WriteLine($"[{DateTime.Now}]\nException message: {ex.Message} The file is: {jsonFileName}\nStack trace:{ex.StackTrace}\n");
+        }
+    }
+
+}
 
 
