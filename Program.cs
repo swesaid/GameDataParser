@@ -5,11 +5,20 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        IUserInteraction userInteraction = new ConsoleUserInteraction();
-        IGameDataRepository gameDataRepository = new GameDataFileRepository();
+        try
+        {
+            IUserInteraction userInteraction = new ConsoleUserInteraction();
+            IGameDataRepository gameDataRepository = new GameDataFileRepository(userInteraction);
 
-        GameDataParserApp App = new GameDataParserApp(userInteraction, gameDataRepository);
-        App.Run();
+            GameDataParserApp App = new GameDataParserApp(userInteraction, gameDataRepository);
+            App.Run();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Sorry! The application has experienced an unexpected error and will have to be closed.");
+            Console.WriteLine("Press any key to close.");
+            Console.ReadKey();
+        }
     }
 }
 
@@ -22,7 +31,6 @@ public class GameDataParserApp
     {
         _userInteraction = userInteraction;
         _gameDataRepository = gameDataRepository;
-
     }
 
     public void Run()
@@ -35,9 +43,11 @@ public class GameDataParserApp
         
         //Printing the game data.
         _userInteraction.PrintGamesData(gameData);
-
+       
         _userInteraction.ShowMessage("\nPress any key to close.");
-        Console.ReadKey();
+         Console.ReadKey();
+
+
     }
 }
 
@@ -48,6 +58,8 @@ public interface IUserInteraction
     void ShowMessageWithoutNewLine(string message);
 
     void PrintGamesData(List<GameData> gameDatas);
+
+    void ShowMessageInRed(string message);
 }
 
 public class ConsoleUserInteraction : IUserInteraction
@@ -75,9 +87,6 @@ public class ConsoleUserInteraction : IUserInteraction
                 else
                     return fileName;
             }
-            
-           
-
         }
     }
 
@@ -101,8 +110,14 @@ public class ConsoleUserInteraction : IUserInteraction
         }
         else
             Console.WriteLine("No games are present in the input file.");
-    }
 
+    }
+    public void ShowMessageInRed(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(message);
+        Console.ResetColor();
+    }
 }
 
 public class GameData
@@ -116,8 +131,6 @@ public class GameData
     {
         return $"{Title}, released in {ReleaseYear}, rating: {Rating}";
     }
-
-
 }
 
 
@@ -125,19 +138,32 @@ public class GameData
 public interface IGameDataRepository
 {
     List<GameData> Read(string fileName);
-
 }
 
 public class GameDataFileRepository : IGameDataRepository 
 {
-    public List<GameData> Read(string fileName)
+    private readonly IUserInteraction _userInteraction;
+    public GameDataFileRepository(IUserInteraction userInteraction)
     {
-        string jsonContent = File.ReadAllText(fileName);
-        List<GameData> gameDatas = JsonSerializer.Deserialize<List<GameData>>(jsonContent);
-
-        return gameDatas;
+        _userInteraction = userInteraction;
     }
 
+    public List<GameData> Read(string fileName)
+    {
+        string jsonContent = "";
+        try
+        {
+            jsonContent = File.ReadAllText(fileName);
+            List<GameData> gameDatas = JsonSerializer.Deserialize<List<GameData>>(jsonContent);
+            return gameDatas;
+        }
+
+        catch(JsonException ex) 
+        {
+            _userInteraction.ShowMessageInRed($"JSON in the {fileName} was not in a valid format. JSON body: \n{jsonContent}");
+            throw;
+        }
+    }
 }
 
 
