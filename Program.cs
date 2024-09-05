@@ -22,8 +22,7 @@ public class Program
         catch (Exception ex)
         {
             Console.WriteLine("Sorry! The application has experienced an unexpected error and will have to be closed.");
-            string jsonFileName = App.FileName;
-            logger.Log(jsonFileName, ex);
+            logger.Log(ex);
         }
 
         Console.WriteLine("Press any key to close.");
@@ -32,9 +31,7 @@ public class Program
 }
 
 public class GameDataParserApp
-{
-    public string FileName { get; private set; }
-   
+{   
     private readonly IUserInteraction _userInteraction;
     private readonly IGameDataDeserializer _gameDataDeserializer;
     private readonly IGameDataPrinter _gameDataPrinter;
@@ -51,13 +48,13 @@ public class GameDataParserApp
     public void Run()
     {
         //Getting file name from user
-        FileName = _userInteraction.ReadFileNameFromUser();
+        string fileName = _userInteraction.ReadFileNameFromUser();
         
         //Getting the content from a file.
-        string fileContent = _fileReader.Read(FileName);
+        string fileContent = _fileReader.Read(fileName);
         
         //Reading the game data from a Json file.
-        List<GameData> gameData = _gameDataDeserializer.Deserialize(FileName, fileContent);
+        List<GameData> gameData = _gameDataDeserializer.Deserialize(fileName, fileContent);
 
         //Printing the game data.
         _gameDataPrinter.Print(gameData);
@@ -172,24 +169,24 @@ public class GameDataDeserializer : IGameDataDeserializer
         catch(JsonException ex) 
         {
             _userInteraction.ShowError($"JSON in the {fileName} was not in a valid format. JSON body: \n{jsonContent}");
-            throw;
+            throw new JsonException($"{ex.Message} The file is: {fileName}", ex);
         }
     }
 }
 
 public interface ILogger
 {
-    void Log(string fileName, Exception ex);
+    void Log(Exception ex);
 }
 
 public class ApplicationErrorLogger : ILogger
 {
     private const string _logFileName = "log.txt";
-    public void Log(string jsonFileName, Exception ex)
+    public void Log(Exception ex)
     {
         using (StreamWriter file = new StreamWriter(_logFileName, append: true))
         {
-            file.WriteLine($"[{DateTime.Now}]\nException message: {ex.Message} The file is: {jsonFileName}\nStack trace:{ex.StackTrace}\n");
+            file.WriteLine($"[{DateTime.Now}]\nException message: {ex.Message}\nStack trace:{ex.StackTrace}\n");
         }
     }
 
