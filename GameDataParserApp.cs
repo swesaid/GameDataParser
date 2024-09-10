@@ -4,7 +4,6 @@
     private readonly IGameDataDeserializer _gameDataDeserializer;
     private readonly IGameDataPrinter _gameDataPrinter;
     private readonly IFileReader _fileReader;
-
     public GameDataParserApp(IUserInteraction userInteraction, IGameDataDeserializer gameDataRepository, IGameDataPrinter gameDataPrinter, IFileReader fileReader)
     {
         _userInteraction = userInteraction;

@@ -1,6 +1,11 @@
 ﻿public class ApplicationErrorLogger : ILogger
 {
-    private const string _logFileName = "log.txt";
+    private string _logFileName;
+
+    public ApplicationErrorLogger(string logFileName)
+    {
+        _logFileName = logFileName;
+    }
     public void Log(Exception ex)
     {
         using (StreamWriter file = new StreamWriter(_logFileName, append: true))

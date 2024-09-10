@@ -1,15 +1,22 @@
-﻿public class Program 
+﻿
+public class Program 
 {
     public static void Main(string[] args)
     {
+        string dataFolderName = "data";
+        string logsFolderName = "logs";
 
-        IUserInteraction userInteraction = new ConsoleUserInteraction();
+        IPathBuilder pathBuilder = new PathBuilder(dataFolderName, logsFolderName);
+        IUserInteraction userInteraction = new ConsoleUserInteraction(pathBuilder);
         IGameDataDeserializer gameDataDeserializer = new GameDataDeserializer(userInteraction);
         IGameDataPrinter gameDataPrinter = new GameDataPrinter(userInteraction);
         IFileReader fileReader = new LocalFileReader();
-        ILogger logger = new ApplicationErrorLogger();
-
+        
+        ILogger logger = new ApplicationErrorLogger(pathBuilder.BuildLogFilePath("log.txt"));
+     
+     
         GameDataParserApp App = new GameDataParserApp(userInteraction, gameDataDeserializer, gameDataPrinter, fileReader);
+
 
         try
         {

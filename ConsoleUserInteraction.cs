@@ -1,5 +1,11 @@
 ﻿public class ConsoleUserInteraction : IUserInteraction
 {
+    private readonly IPathBuilder _pathBuilder;
+
+    public ConsoleUserInteraction(IPathBuilder pathBuilder)
+    {
+        _pathBuilder = pathBuilder;
+    }
     public string ReadFileNameFromUser()
     {
         string fileName = "";
@@ -18,6 +24,7 @@
             }
             else
             {
+                fileName = _pathBuilder.BuildFilePath(fileName);
                 if (!File.Exists(fileName))
                     ShowMessage("File not found.\n");
                 else
