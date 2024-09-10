@@ -1,4 +1,5 @@
-﻿public class GameData
+﻿namespace GameDataParser.Models;
+public class GameData
 { 
     public string Title { get; init; }
     public int ReleaseYear { get; init; }

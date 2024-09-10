@@ -1,4 +1,5 @@
-﻿public class GameDataPrinter : IGameDataPrinter
+﻿namespace GameDataParser.UserInteraction;
+public class GameDataPrinter : IGameDataPrinter
 {
     private readonly IUserInteraction _userInteraction;
 

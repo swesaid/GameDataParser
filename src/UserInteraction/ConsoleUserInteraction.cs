@@ -1,4 +1,5 @@
-﻿public class ConsoleUserInteraction : IUserInteraction
+﻿namespace GameDataParser.UserInteraction;
+public class ConsoleUserInteraction : IUserInteraction
 {
     private readonly IPathBuilder _pathBuilder;
 

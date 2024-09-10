@@ -1,4 +1,5 @@
-﻿public interface IUserInteraction
+﻿namespace GameDataParser.UserInteraction;
+public interface IUserInteraction
 {
     string ReadFileNameFromUser();
     void ShowMessage(string message);

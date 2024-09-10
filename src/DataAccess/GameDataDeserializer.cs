@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿namespace GameDataParser.DataAccess;
 
 public class GameDataDeserializer : IGameDataDeserializer 
 {

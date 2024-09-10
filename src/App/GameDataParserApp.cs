@@ -1,5 +1,6 @@
-﻿public class GameDataParserApp
-{   
+﻿namespace GameDataParser.App;
+public class GameDataParserApp
+{
     private readonly IUserInteraction _userInteraction;
     private readonly IGameDataDeserializer _gameDataDeserializer;
     private readonly IGameDataPrinter _gameDataPrinter;
@@ -16,10 +17,10 @@
     {
         //Getting file name from user
         string fileName = _userInteraction.ReadFileNameFromUser();
-        
+
         //Getting the content from a file.
         string fileContent = _fileReader.Read(fileName);
-        
+
         //Reading the game data from a Json file.
         List<GameData> gameData = _gameDataDeserializer.Deserialize(fileName, fileContent);
 

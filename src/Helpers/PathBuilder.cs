@@ -1,4 +1,4 @@
-﻿
+﻿namespace GameDataParser.Helpers;
 public class PathBuilder : IPathBuilder
 {
     private string _dataFolderName;

@@ -1,4 +1,5 @@
-﻿public class ApplicationErrorLogger : ILogger
+﻿namespace GameDataParser.Logging;
+public class ApplicationErrorLogger : ILogger
 {
     private string _logFileName;
 
