@@ -24,6 +24,12 @@ public class PathBuilder : IPathBuilder
 
     public string BuildLogFilePath(string logFileName)
     {
-        return Path.Combine(GetProjectRootDirectory(), _logsFolderName, logFileName);
+        string logsFolderPath = Path.Combine(GetProjectRootDirectory(), _logsFolderName);
+
+        if (!Directory.Exists(logsFolderPath))
+        {
+            Directory.CreateDirectory(logsFolderPath);
+        }
+        return Path.Combine(logsFolderPath, logFileName);
     }
 }
